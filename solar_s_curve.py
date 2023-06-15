@@ -51,12 +51,12 @@ rc = RestClient(
     params = {
         'offset': '0',
 
-        'start':  '2021-01-01T00:00',
+#        'start':  '2021-01-01T00:00',
 #        'end':    '2022-01-01T00:00',
 #        'end':    '2022-01-01T02:00',
 
 #        'start':  '2022-01-01T00:00',
-        'end':    '2023-01-01T00:00',
+#        'end':    '2023-01-01T00:00',
 
 #        'start':  '2022-06-01T22:00',
 #        'end':    '2023-06-01T22:00',
@@ -66,6 +66,13 @@ rc = RestClient(
 
 #        'start':  '2023-04-12T02:00',
 #        'end':    '2023-04-13T02:00',
+
+#        'start':  '2022-03-01T00:00',
+#        'end':    '2022-03-12T00:00',
+
+        'start':  '2022-08-07T16:00',
+        'end':    '2022-08-24T00:00',
+
 
 #            'start':  '2017-01-01T00:00',
 #            'start':  '2018-01-01T00:00',
@@ -105,6 +112,8 @@ rc = RestClient(
 outfilename = 'graph_2021-2022.png'
 outfilename2 = 'scatter_2021-2022.png'
 
+#outfilename = 'graph_2022_dunkelflaute2.png'
+#outfilename2 = 'scatter_2022_dunkelflaute2.png'
 
 
 def getCapacities(idx=None):
@@ -205,11 +214,13 @@ for colname in df2.columns:
 
 print('--------------- Diagram start ------------------------')
 
+act_inst_factor = 1
+
 consumplist = ['GrossConsumptionMWh']
 
 dfGraphAbs = df2[consumplist]
-dfGraphAbs.loc[df2.index,'windtotal'] = df2[windlist].sum(axis=1)
-dfGraphAbs.loc[df2.index,'solartotal'] = df2[solarlist].sum(axis=1)
+dfGraphAbs.loc[df2.index,'windtotal'] = df2[windlist].sum(axis=1) * act_inst_factor
+dfGraphAbs.loc[df2.index,'solartotal'] = df2[solarlist].sum(axis=1) * act_inst_factor
 dfGraphAbs.loc[df2.index,'wstotal'] = dfGraphAbs['windtotal'] + dfGraphAbs['solartotal']
 dfGraphAbs.loc[df2.index,'wssurplus'] = dfGraphAbs['windtotal'] + dfGraphAbs['solartotal'] - dfGraphAbs['GrossConsumptionMWh']
 
@@ -231,7 +242,11 @@ x = array(dfGraphAbs.index)
 y1 = array(dfGraphAbs['wstotal'])
 y2 = array(dfGraphAbs['GrossConsumptionMWh'])
 
-ax1.set_title('Elforbrug og VE-produktion')
+if act_inst_factor == 1:
+    ax1.set_title('Elforbrug og VE-produktion')
+else:
+    ax1.set_title('Elforbrug og VE-produktion ved {:.00f}x faktisk kapacitet'.format(act_inst_factor))
+
 #ax2.plot(x, y1, '-')
 ax1.plot(x, y2, '-', label='Elforbrug DK1+DK2')
 ax1.plot(x, y1, '-', color='C2', label='Elproduktion fra sol og vind DK1+DK2')
