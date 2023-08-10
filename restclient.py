@@ -41,7 +41,12 @@ class RestClient:
         )
         self.reqCode = self.request.status_code
         self.reqText = self.request.text
-        self.reqJson = json.loads(self.reqText)
+        try:
+            self.reqJson = json.loads(self.reqText)
+        except:
+            print('Extracting JSON from response failed.')
+            print('Status code:   ', self.reqCode)
+            print('Response text: ', self.reqText)
 
     def getAsDataFrame(self):
         if (self.reqCode != 200):

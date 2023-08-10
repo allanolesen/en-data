@@ -1,6 +1,7 @@
 from numpy import linspace, array, minimum
 from pandas import DataFrame, to_datetime
 from restclient import RestClient
+from veplots import plotcanvas
 
 def printstats(df, columnlist, description='', sercap=None):
 
@@ -67,11 +68,12 @@ rc = RestClient(
 #        'start':  '2023-04-12T02:00',
 #        'end':    '2023-04-13T02:00',
 
-#        'start':  '2022-03-01T00:00',
-#        'end':    '2022-03-12T00:00',
+        'start':  '2022-03-01T00:00',
+        'end':    '2022-03-12T00:00',
 
-        'start':  '2022-08-07T16:00',
-        'end':    '2022-08-24T00:00',
+#        'start':  '2022-08-07T16:00',
+#        'end':    '2022-08-24T00:00',
+#        'end':    '2022-08-08T20:00',
 
 
 #            'start':  '2017-01-01T00:00',
@@ -91,6 +93,8 @@ rc = RestClient(
 #        'filter': '{"PriceArea": ["DK1"]}',
         'sort':   'HourUTC ASC',
         #'timezone': 'dk',
+        'columns': 'HourUTC,PriceArea,GrossConsumptionMWh,OffshoreWindLt100MW_MWh,OffshoreWindGe100MW_MWh,OnshoreWindLt50kW_MWh,OnshoreWindGe50kW_MWh,SolarPowerLt10kW_MWh,SolarPowerGe10Lt40kW_MWh,SolarPowerGe40kW_MWh,SolarPowerSelfConMWh',
+#        'columns': ['HourUTC', 'PriceArea', 'GrossConsumptionMWh', 'OffshoreWindLt100MW_MWh', 'OffshoreWindGe100MW_MWh', 'OnshoreWindLt50kW_MWh', 'OnshoreWindGe50kW_MWh', 'SolarPowerLt10kW_MWh', 'SolarPowerGe10Lt40kW_MWh', 'SolarPowerGe40kW_MWh', 'SolarPowerSelfConMWh'],
     },
     tablekey = 'records',
     indexkey = 'HourUTC',
@@ -98,8 +102,8 @@ rc = RestClient(
 
 #outfilename = 'graph_2021.png'
 
-#outfilename = 'graph_2022.png'
-#outfilename2 = 'scatter_2022.png'
+outfilename = 'graph_2022_03_x8.png'
+outfilename2 = 'scatter_2022_03_x8.png'
 
 #outfilename = 'graph_2022-23.png'
 
@@ -109,8 +113,8 @@ rc = RestClient(
 #outfilename = 'graph_2023_1D.png'
 
 
-outfilename = 'graph_2021-2022.png'
-outfilename2 = 'scatter_2021-2022.png'
+#outfilename = 'graph_2021-2022.png'
+#outfilename2 = 'scatter_2021-2022.png'
 
 #outfilename = 'graph_2022_dunkelflaute2.png'
 #outfilename2 = 'scatter_2022_dunkelflaute2.png'
@@ -210,15 +214,17 @@ for colname in df2.columns:
         solarlist.append(colname)
 
 
-
+with open('columns.txt', 'w') as f:
+    f.write(str(['GrossConsumptionMWh', *windlist, *solarlist]))
 
 print('--------------- Diagram start ------------------------')
 
-act_inst_factor = 1
+act_inst_factor = 8
 
 consumplist = ['GrossConsumptionMWh']
 
-dfGraphAbs = df2[consumplist]
+dfGraphAbs = df2[consumplist].copy()
+
 dfGraphAbs.loc[df2.index,'windtotal'] = df2[windlist].sum(axis=1) * act_inst_factor
 dfGraphAbs.loc[df2.index,'solartotal'] = df2[solarlist].sum(axis=1) * act_inst_factor
 dfGraphAbs.loc[df2.index,'wstotal'] = dfGraphAbs['windtotal'] + dfGraphAbs['solartotal']
@@ -330,6 +336,11 @@ fig.savefig(outfilename2)
 
 
 print('--------------- Diagram end2 ------------------------')
+
+pc = plotcanvas(outfilename='test.png', countw=1, counth=1, pixelw=1920, pixelh=1080, dpi=100,)
+pc.plot_total_prod_and_consumpt_to_ax(df=dfGraphAbs, axnum=0, title='stakkede ting i MW')
+pc.output_to_file()
+
 
 
 #print(dfcap)
