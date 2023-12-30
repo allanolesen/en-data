@@ -62,14 +62,14 @@ rc = RestClient(
 #        'start':  '2022-06-01T22:00',
 #        'end':    '2023-06-01T22:00',
 
-#        'start':  '2023-04-30T22:00',
-#        'end':    '2023-05-31T22:00',
+        'start':  '2023-04-30T22:00',
+        'end':    '2023-05-28T22:00',
 
 #        'start':  '2023-04-12T02:00',
 #        'end':    '2023-04-13T02:00',
 
-        'start':  '2022-03-01T00:00',
-        'end':    '2022-03-12T00:00',
+#        'start':  '2022-03-01T00:00',
+#        'end':    '2022-03-12T00:00',
 
 #        'start':  '2022-08-07T16:00',
 #        'end':    '2022-08-24T00:00',
@@ -100,10 +100,12 @@ rc = RestClient(
     indexkey = 'HourUTC',
 )
 
+act_inst_factor = 4
+
 #outfilename = 'graph_2021.png'
 
-outfilename = 'graph_2022_03_x8.png'
-outfilename2 = 'scatter_2022_03_x8.png'
+outfilename = 'graph_2023_05_x4_dpi200.png'
+outfilename2 = 'scatter_2023_05_x4_dpi200.png'
 
 #outfilename = 'graph_2022-23.png'
 
@@ -219,7 +221,6 @@ with open('columns.txt', 'w') as f:
 
 print('--------------- Diagram start ------------------------')
 
-act_inst_factor = 8
 
 consumplist = ['GrossConsumptionMWh']
 
@@ -237,12 +238,25 @@ dfGraphAbs.loc[df2.index,'solarcf'] = dfGraphAbs['solartotal'] / dfcap['solartot
 dfGraphSorted = dfGraphAbs.sort_values(by='wssurplus', axis=0).reset_index()
 
 
+pc = plotcanvas(outfilename='test_plotcanvas.png')
+pc.plot_all(dfGraphAbs, titlesuffix='asdf')
+pc.output_to_file()
+
+
+
+
 import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 
-mydpi = 100
+mydpi = 200
 fig, (ax1, ax2, ax3) = plt.subplots(3, 1, sharex=False, figsize=(1920/mydpi,1080/mydpi), dpi=mydpi)
+#fig = plt.figure(figsize=(1920/mydpi,1080/mydpi), dpi=mydpi)
+#subfigs = fig.subfigures(ncols=1,nrows=3)
+#ax1 = subfigs[0].subplots()
+#ax2 = subfigs[1].subplots()
+#ax3 = subfigs[2].subplots()
+
 
 x = array(dfGraphAbs.index)
 y1 = array(dfGraphAbs['wstotal'])
@@ -254,14 +268,14 @@ else:
     ax1.set_title('Elforbrug og VE-produktion ved {:.00f}x faktisk kapacitet'.format(act_inst_factor))
 
 #ax2.plot(x, y1, '-')
-ax1.plot(x, y2, '-', label='Elforbrug DK1+DK2')
-ax1.plot(x, y1, '-', color='C2', label='Elproduktion fra sol og vind DK1+DK2')
+ax1.plot(x, y2, '-', linewidth=0.6, label='Elforbrug DK1+DK2')
+ax1.plot(x, y1, '-', linewidth=0.6, color='C2', label='Elproduktion fra sol og vind DK1+DK2')
 ax1.fill_between(x, y1, y2, where=(y1 > y2), color='C2', alpha=0.3,
-                 interpolate=True)
+                 interpolate=True, edgecolor='white', linewidth=0)
 ax1.fill_between(x, y1, y2, where=(y1 <= y2), color='C3', alpha=0.3,
-                 interpolate=True)
+                 interpolate=True, edgecolor='white', linewidth=0)
 ax1.fill_between(x, 0, minimum(y1,y2), color='C2', alpha=0.6,
-                 interpolate=True)
+                 interpolate=True, edgecolor='white', linewidth=0)
 ax1.legend()
 ax1.set_xlabel('Dato og tid, UTC')
 ax1.set_ylabel('MW')
@@ -287,9 +301,6 @@ negtimer = (y1<0).sum()
 postimer = (y1>=0).sum()
 
 
-negtext = '{:.0f} timer - {:.3f} GWh'.format(negtimer, negsum/1000)
-postext = '{:.0f} timer - {:.3f} GWh'.format(postimer, possum/1000)
-
 
 
 ax3.set_title('Overskud af VE-produktion i forhold til forbrug, sorteret')
@@ -303,11 +314,46 @@ ax3.fill_between(x, 0, y1, where=(y1 <= 0), color='C3', alpha=0.3,
 #                 interpolate=True)
 ax3.set_xlabel('Timer')
 ax3.set_ylabel('MW')
-ax3.text(x=negtimer/3, y=-500, ha='center', va='center', s=negtext, color='C3')
-ax3.text(x=negtimer+postimer*2/3, y=500,  ha='center', va='center', s=postext, color='C2')
 
+# Print summary of hours and GWh after finding best position in plot
+
+xlim = ax3.get_xlim()
+ylim = ax3.get_ylim()
+
+yspan = ylim[1]-ylim[0]
+yfracpos = ylim[1]/yspan
+
+if yfracpos < 0.3:
+    ypos1 = - 0.12 * yspan
+    ypos2 = - 0.12 * yspan
+elif yfracpos > 0.7:
+    ypos1 = 0.1 * yspan
+    ypos2 = 0.1 * yspan
+else:
+    ypos1 = 0.1 * yspan
+    ypos2 = -0.12 * yspan
+
+
+xpos1 = (negtimer+postimer) * 0.005
+xpos2 = (negtimer+postimer) * 0.995
+
+negtext = '{:.0f} timer; {:.0f} GWh'.format(negtimer, negsum/1000)
+postext = '{:.0f} timer; {:.0f} GWh'.format(postimer, possum/1000)
+
+ax3.text(x=xpos1, y=ypos1, ha='left', va='center', s=negtext, color='C3')
+ax3.text(x=xpos2, y=ypos2, ha='right', va='center', s=postext, color='C2')
 
 fig.tight_layout()
+
+# Change background colour of the middle subplot to discern it from others
+#bbox = ax2.get_position()
+#bbox = ax2.get_tightbbox(renderer=fig.canvas.get_renderer())
+#print(type(bbox))
+#print(bbox)
+#rect = matplotlib.patches.Rectangle((0,bbox.y0),1,bbox.height, color='grey', zorder=-1)
+rect = matplotlib.patches.Rectangle((0,0.345),1,0.32, color='cornsilk', zorder=-1)
+fig.add_artist(rect)
+ax2.set_facecolor('floralwhite')
 
 fig.savefig(outfilename)
 
@@ -337,9 +383,9 @@ fig.savefig(outfilename2)
 
 print('--------------- Diagram end2 ------------------------')
 
-pc = plotcanvas(outfilename='test.png', countw=1, counth=1, pixelw=1920, pixelh=1080, dpi=100,)
-pc.plot_total_prod_and_consumpt_to_ax(df=dfGraphAbs, axnum=0, title='stakkede ting i MW')
-pc.output_to_file()
+#pc = plotcanvas(outfilename='test.png', countw=1, counth=1, pixelw=1920, pixelh=1080, dpi=100,)
+#pc.plot_all(df=dfGraphAbs, titlesuffix='stakkede ting i MW')
+#pc.output_to_file()
 
 
 
