@@ -19,8 +19,9 @@ print(dfcap)
 
 print(1)
 #coprve = CoprVE(start='2022-06-01T02:00', end='2022-06-12T01:00')
-coprve = CoprVE(start='2022-01-01T01:00', end='2023-01-01T00:00')
-#coprve = CoprVE(start='2022-01-01T01:00', end='2022-08-01T00:00')
+#coprve = CoprVE(start='2022-12-24T01:00', end='2023-12-24T01:00')
+#coprve = CoprVE(start='2022-01-01T01:00', end='2023-01-01T01:00')
+coprve = CoprVE(start='2023-01-01T01:00', end='2024-01-01T01:00')
 
 #coprve = CoprVE(start='2022-08-01T02:00', end='2023-08-01T10:00')
 #coprve = CoprVE(start='2022-06-01T00:00', end='2023-08-29T00:00')
@@ -49,12 +50,17 @@ dict_scale_args = dict(
 dfscaled = coprve. get_with_rescaled_cap(**dict_scale_args)
 print(dfscaled)
 
-pc = plotcanvas(outfilename='test_ve_s_curve.png')
-pc.plot_all(dfscaled, titlesuffix='asdf')
+pc = plotcanvas(outfilename='test_ve_s_curve_2023.png')
+pc.plot_all(dfscaled, titlesuffix='Produktion opgraderet til 2030-målet fra Folketingsaftalen fra 2022')
 pc.output_to_file()
 
-pc = plotcanvas(outfilename='test_ve_s_curve3.png', counth=1)
-pc.plot_sorted_prod_excess_to_ax(dfscaled, axnum=0, titlesuffix='asdf')
+pc = plotcanvas(outfilename='test_ve_s_curve3_2023.png', counth=1)
+pc.plot_sorted_prod_excess_to_ax(dfscaled, axnum=0, titlesuffix='(2023-forbrug med 2030-produktion)', ascending=False)
+pc.axes[0].grid(which='both')
+pc.axes[0].grid(which='minor', linewidth=0.5, color='grey', alpha=0.1)
+pc.axes[0].minorticks_on()
+pc.axes[0].set_xlim((0,len(dfscaled.index)))
+
 pc.output_to_file()
 
 
@@ -63,12 +69,32 @@ dfstreak = coprve. get_streaks(get_stacked=True, **dict_scale_args)
 print(dfstreak)
 
 pc = plotcanvas(outfilename='test_ve_gaphours.png', counth=2)
-pc.plot_streak_hours_stacked(dfstreak, axnum=0, titlesuffix='asdf')
-pc.plot_streak_energy_stacked(dfstreak, axnum=1, titlesuffix='asdf')
+pc.plot_streak_hours_stacked(dfstreak, axnum=0, titlesuffix='(2023-forbrug med 2030-produktion)')
+pc.plot_streak_energy_stacked(dfstreak, axnum=1, titlesuffix='(2023-forbrug med 2030-produktion)')
 pc.output_to_file()
 
 
 df4 = dfstreak.unstack(fill_value=0).drop(999999, axis=1, level='stacksubID').loc(axis=1)['count'].sum(axis=1)
+
+
+
+# Brug af rullende 24h middel
+dfsroll24 = dfscaled.rolling(24, min_periods=24).mean().iloc(axis=0)[24:]
+pc = plotcanvas(outfilename='test_ve_s_curve_roll24.png')
+pc.plot_all(dfsroll24, titlesuffix='24h middelværdier. Produktion opgraderet til 2030-målet fra 2022')
+pc.output_to_file()
+
+pc = plotcanvas(outfilename='test_ve_s_curve3_roll24.png', counth=1)
+pc.plot_sorted_prod_excess_to_ax(dfsroll24, axnum=0, titlesuffix='(24h middelværdier. 2023-forbrug med 2030-produktion)', ascending=False)
+pc.axes[0].grid(which='both')
+pc.axes[0].grid(which='minor', linewidth=0.5, color='grey', alpha=0.1)
+pc.axes[0].minorticks_on()
+pc.axes[0].set_xlim((0,len(dfscaled.index)))
+
+pc.output_to_file()
+
+
+
 
 """
 pc = plotcanvas(outfilename='test_ve_gaphours.png', counth=2)

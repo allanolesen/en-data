@@ -85,7 +85,7 @@ class plotcanvas():
         #ax.legend()
 
 
-    def plot_sorted_prod_excess_to_ax(self, df:DataFrame, axnum:int, titlesuffix:Optional[str]=None):
+    def plot_sorted_prod_excess_to_ax(self, df:DataFrame, axnum:int, titlesuffix:Optional[str]=None, ascending=True):
         ax=self.axes[axnum]
 
         if titlesuffix is None:
@@ -96,7 +96,7 @@ class plotcanvas():
         ax.set_xlabel('Timer')
         ax.set_ylabel('MW')
 
-        dfGraphSorted = df.sort_values(by='vesurplus', axis=0).reset_index()
+        dfGraphSorted = df.sort_values(by='vesurplus', axis=0, ascending=ascending).reset_index()
         x = array(dfGraphSorted.index)
         y1 = array(dfGraphSorted['vesurplus'])
         negsum = ((y1<0) * y1).sum()
@@ -124,14 +124,22 @@ class plotcanvas():
             ypos1 = 0.1 * yspan
             ypos2 = -0.12 * yspan
 
-        xpos1 = (negtimer+postimer) * 0.005
-        xpos2 = (negtimer+postimer) * 0.995
-
         negtext = '{:.0f} timer; {:.0f} GWh'.format(negtimer, negsum/1000)
         postext = '{:.0f} timer; {:.0f} GWh'.format(postimer, possum/1000)
 
-        ax.text(x=xpos1, y=ypos1, ha='left', va='center', s=negtext, color='C3')
-        ax.text(x=xpos2, y=ypos2, ha='right', va='center', s=postext, color='C2')
+
+        if ascending:
+            xpos1 = (negtimer+postimer) * 0.005
+            xpos2 = (negtimer+postimer) * 0.995
+            ax.text(x=xpos1, y=ypos1, ha='left', va='center', s=negtext, color='C3')
+            ax.text(x=xpos2, y=ypos2, ha='right', va='center', s=postext, color='C2')
+        else:
+            xpos1 = (negtimer+postimer) * 0.995
+            xpos2 = (negtimer+postimer) * 0.005
+            ax.text(x=xpos1, y=ypos1, ha='right', va='center', s=negtext, color='C3')
+            ax.text(x=xpos2, y=ypos2, ha='left', va='center', s=postext, color='C2')
+
+
         #ax.legend()
 
 
