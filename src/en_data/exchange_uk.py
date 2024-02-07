@@ -1,6 +1,8 @@
 from numpy import linspace, array, minimum, nan, where, trapz, timedelta64
 import numpy as np
 from pandas import Series
+import pandas as pd
+
 #from pandas import DataFrame, to_datetime, concat, Timestamp
 #from typing import Optional
 
@@ -24,7 +26,7 @@ rc = RestClient(
     params = {
         'offset': '0',
         'start':  '2023-12-29T12:00',
-        #'end':    '2024-12-31T00:00',
+        'end':    '2023-12-31T00:00',
         'sort':   'Minutes1DK',
         #'timezone': 'dk',
     },
@@ -58,7 +60,7 @@ values_aft = sery_aft.values
 
 times_int = times_bef + (times_aft-times_bef) * values_bef / (values_bef-values_aft)
 ser_int = Series(0, index=times_int, dtype=float)
-sery_int = sery.append(ser_int).sort_index()
+sery_int = pd.concat([sery,ser_int]).sort_index()
 
 countw: int = 1
 counth: int = 1
