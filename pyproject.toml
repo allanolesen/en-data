@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "en-data"
+version = "0.1.0"
+description = "Misc. tools for plotting or analyzing data from EnergiNet in Denmark"
+authors = ["allanolesen <83980198+allanolesen@users.noreply.github.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = ">=3.10, <3.13"
+pandas = "*"
+numpy = "*"
+matplotlib = "*"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

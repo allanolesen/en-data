@@ -7,6 +7,7 @@ import pandas as pd
 #from typing import Optional
 
 from matplotlib import pyplot as plt
+from matplotlib.axes import Axes
 import matplotlib.dates as mdates
 from datetime import date
 
@@ -26,7 +27,7 @@ rc = RestClient(
     params = {
         'offset': '0',
         'start':  '2023-12-29T12:00',
-        'end':    '2023-12-31T00:00',
+        'end':    '2024-12-31T00:00',
         'sort':   'Minutes1DK',
         #'timezone': 'dk',
     },
@@ -68,11 +69,17 @@ pixelw: int = 1920
 pixelh: int = 1080
 dpi: int = 200
 
-fn = 'uk_exhange.png'
+fn = 'output/uk_exhange.png'
 
 print(counth, countw, pixelw/dpi, pixelh/dpi, dpi)
 
+ax: Axes
+
 fig, ax = plt.subplots(counth, countw, figsize=(pixelw/dpi, pixelh/dpi), dpi=dpi)
+
+#ax = 1
+# A hack to force Docs View and Intellisense to know that the object type of ax
+#ax:Axes=ax
 
 ax.set_title('Viking Link')
 
