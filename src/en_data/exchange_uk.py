@@ -26,7 +26,8 @@ rc = RestClient(
     srcTable = 'PowerSystemRightNow',
     params = {
         'offset': '0',
-        'start':  '2023-12-29T12:00',
+        'start':  '2024-04-01T00:00',
+        # 'start':  '2023-12-29T12:00',
         'end':    '2024-12-31T00:00',
         'sort':   'Minutes1DK',
         #'timezone': 'dk',
@@ -69,7 +70,7 @@ pixelw: int = 1920
 pixelh: int = 1080
 dpi: int = 200
 
-fn = 'output/uk_exhange.png'
+fn = 'output/uk_exhange2.png'
 
 print(counth, countw, pixelw/dpi, pixelh/dpi, dpi)
 
@@ -132,6 +133,7 @@ ax.set_xlim((firstx,None))
 ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
 ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
 
+#ax.xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
 ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
 #ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d-%m"))
 ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
