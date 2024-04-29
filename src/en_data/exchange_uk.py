@@ -128,15 +128,43 @@ print(firstx)
 print(type(firstx))
 ax.set_xlim((firstx,None))
 
-
+xlim = ax.get_xlim()
+xrange = xlim[1]-xlim[0]
+print(f"{xlim = } ; {xrange = }")
 # S axis
-ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
-ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
+
+if xrange < 12:
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
+    ax.xaxis.set_minor_locator(mdates.HourLocator(byhour=[0,6,12,18]))
+    #ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
+    tl = ax.get_xticklabels(which='minor')
+    print(tl)
+    #plt.setp(ax.get_xticklabels(which='minor'), visible=False)
+    #plt.setp(ax.get_xticklabels(which='minor')[::2], visible=True)
+    plt.setp(ax.get_xticklabels(which='minor')[1::2], visible=False)
+
+elif xrange < 29:
+    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
+    ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
+elif xrange < 59:
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=[1,15]))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
+    ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
+else:
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=1))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
+    ax.xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d-%b"))
+
+
 
 #ax.xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
-ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
 #ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d-%m"))
-ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
 #ax.xaxis.set_minor_locator(mdates.HourLocator(byhour=[0,3,6,9,12,15,18,21]))
 #ax.xaxis.set_minor_formatter(mdates.DateFormatter("%H:%M"))
 #plt.setp(ax.get_xticklabels(which='minor'), visible=False)
@@ -161,7 +189,6 @@ ax.grid(which='minor', linewidth=0.5, color='grey', alpha=0.1)
 
 mestr = 'Allan Olesen ' + date.today().strftime('%d-%b-%Y')
 
-xlim = ax.get_xlim()
 xpos = xlim[0] + 0.01 * (xlim[1] - xlim[0])
 ylim = ax.get_ylim()
 ypos = ylim[0] + 0.012 * (ylim[1] - ylim[0])
