@@ -43,7 +43,10 @@ class CapacitiesVE():
                     '2023-01-01':  3015, # https://ens.dk/sites/ens.dk/files/Sol/solcelleopgoerelse_q1_2023.pdf
                     '2023-03-31':  3251, # https://ens.dk/sites/ens.dk/files/Sol/solcelleopgoerelse_q1_2023.pdf
                     '2023-06-30':  3372, # https://ens.dk/sites/ens.dk/files/Sol/solcelleopgoerelse_q2_2023_0.pdf
-                    '2024-01-01':  3500, # Guess
+                    '2023-09-30':  3490, # https://ens.dk/sites/ens.dk/files/Sol/solcelleopgoerelse_4._kvartal_2023.pdf
+                    '2023-12-31':  3529, # https://ens.dk/sites/ens.dk/files/Sol/solcelleopgoerelse_1._kvartal_2024.pdf
+                    '2024-03-31':  3645, # https://ens.dk/sites/ens.dk/files/Sol/solcelleopgoerelse_1._kvartal_2024.pdf
+                    '2025-01-01':  4000, # Guess
                 }
 
         for missingdatestr, missingvalue in missingsolar.items():
