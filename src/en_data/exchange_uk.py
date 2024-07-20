@@ -26,7 +26,7 @@ rc = RestClient(
     srcTable = 'PowerSystemRightNow',
     params = {
         'offset': '0',
-        'start':  '2024-04-01T00:00',
+        'start':  '2023-12-01T00:00',
         # 'start':  '2023-12-29T12:00',
         'end':    '2024-12-31T00:00',
         'sort':   'Minutes1DK',
@@ -155,11 +155,16 @@ elif xrange < 59:
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
     ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
     ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
-else:
+elif xrange < 119:
     ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=1))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
     ax.xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
     ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d-%b"))
+else:
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=1))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
+    ax.xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
 
 
 
