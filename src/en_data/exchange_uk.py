@@ -2,6 +2,7 @@ from numpy import linspace, array, minimum, nan, where, trapz, timedelta64
 import numpy as np
 from pandas import Series
 import pandas as pd
+import math
 
 #from pandas import DataFrame, to_datetime, concat, Timestamp
 #from typing import Optional
@@ -9,6 +10,7 @@ import pandas as pd
 from matplotlib import pyplot as plt
 from matplotlib.axes import Axes
 import matplotlib.dates as mdates
+from matplotlib.text import Text
 from datetime import date
 
 # Necessary when running on pythonanywhere.com
@@ -26,9 +28,11 @@ rc = RestClient(
     srcTable = 'PowerSystemRightNow',
     params = {
         'offset': '0',
-        'start':  '2023-12-01T00:00',
+        'start':  '2024-09-18T00:00',
+        # 'start':  '2023-12-01T00:00',
         # 'start':  '2023-12-29T12:00',
-        'end':    '2024-12-31T00:00',
+        'end':    '2024-10-01T00:00',
+        # 'end':    '2024-12-31T00:00',
         'sort':   'Minutes1DK',
         #'timezone': 'dk',
     },
@@ -122,7 +126,7 @@ ax.fill_between(x, 0, y, where=(y <= 0), color='C3', alpha=0.3, interpolate=True
 #ax.plot(x, y1, where=(y1<0), '-', linewidth=3, color='C3', label='DK1 -> UK')
 
 ax.legend()
-ax.set_ylim((-1500,1500))
+ax.set_ylim((-1550,1550))
 firstx = x[0]
 print(firstx)
 print(type(firstx))
@@ -133,17 +137,36 @@ xrange = xlim[1]-xlim[0]
 print(f"{xlim = } ; {xrange = }")
 # S axis
 
-if xrange < 12:
-    ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
+if xrange < 3:
+    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=0))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
-    ax.xaxis.set_minor_locator(mdates.HourLocator(byhour=[0,6,12,18]))
-    #ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
-    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
+    ax.xaxis.set_minor_locator(mdates.HourLocator(byhour=range(24)))
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%-H:%M"))
     tl = ax.get_xticklabels(which='minor')
-    print(tl)
-    #plt.setp(ax.get_xticklabels(which='minor'), visible=False)
-    #plt.setp(ax.get_xticklabels(which='minor')[::2], visible=True)
-    plt.setp(ax.get_xticklabels(which='minor')[1::2], visible=False)
+    tlhidden = [t for t in tl if int(24*t._x) % 3 != 0 ]
+    plt.setp(tlhidden, visible=False)
+
+elif xrange < 8:
+    ax.xaxis.set_major_locator(mdates.HourLocator(byhour=0))
+    ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
+
+    ax.xaxis.set_minor_locator(mdates.HourLocator(byhour=range(0,24,3)))
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%-H:%M"))
+    tl = ax.get_xticklabels(which='minor')
+    tlhidden = [t for t in tl if int(24*t._x) % 6 != 0 ]
+    plt.setp(tlhidden, visible=False)
+
+# elif xrange < 8:
+#     ax.xaxis.set_major_locator(mdates.HourLocator(byhour=0))
+#     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
+#     ax.xaxis.set_minor_locator(mdates.HourLocator(byhour=[0,6,12,18]))
+#     #ax.xaxis.set_minor_locator(mdates.DayLocator(interval=1))
+#     ax.xaxis.set_minor_formatter(mdates.DateFormatter("%-H:%M"))
+#     tl = ax.get_xticklabels(which='minor')
+#     print(tl)
+#     #plt.setp(ax.get_xticklabels(which='minor'), visible=False)
+#     #plt.setp(ax.get_xticklabels(which='minor')[::2], visible=True)
+#     plt.setp(ax.get_xticklabels(which='minor')[1::2], visible=False)
 
 elif xrange < 29:
     ax.xaxis.set_major_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
@@ -161,10 +184,10 @@ elif xrange < 119:
     ax.xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
     ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d-%b"))
 else:
-    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonthday=1))
+    ax.xaxis.set_major_locator(mdates.MonthLocator(bymonth=[1,4,7,10]))
     ax.xaxis.set_major_formatter(mdates.DateFormatter("%d-%b-%Y"))
-    ax.xaxis.set_minor_locator(mdates.WeekdayLocator(byweekday=mdates.MO))
-    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d"))
+    ax.xaxis.set_minor_locator(mdates.MonthLocator(bymonthday=1))
+    ax.xaxis.set_minor_formatter(mdates.DateFormatter("%d-%b"))
 
 
 
